@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rivin Weeraka Portfolio</title>
+    <link rel="icon" type="image/webp" href="assets/rivin-logo.webp">
+    <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
 </head>
 <body>
+    <div id="loading-screen" class="loading-screen">
+        <img src="assets/rivin-logo.webp" alt="Loading...">
+    </div>
+
     <header class="header">
-        <div class="logo">®</div>
+        <a href="#" class="logo">
+            <img src="assets/rivin-logo.webp" alt="Rivin Logo" class="site-logo">
+        </a>
         <nav class="nav">
             <a href="#">ABOUT</a>
             <a href="#">PORTFOLIO</a>
@@ -41,10 +49,18 @@
             height: 800
         });
 
-        PIXI.Assets.load([
-            'assets/masked-photo.webp',
-            'assets/depth-map.webp'
-        ]).then((assets) => {
+        const minLoadTime = new Promise(resolve => setTimeout(resolve, 1500));
+
+        Promise.all([
+            PIXI.Assets.load(['assets/masked-photo.webp', 'assets/depth-map.webp']),
+            minLoadTime
+        ]).then(([assets]) => {
+            // Hide loading screen once main assets are loaded and min time has passed
+            const loader = document.getElementById('loading-screen');
+            if (loader) {
+                loader.classList.add('hidden');
+            }
+
             const imageTex = assets['assets/masked-photo.webp'];
             const depthTex = assets['assets/depth-map.webp'];
             
@@ -97,6 +113,21 @@
                 el.addEventListener('pointerleave', () => {
                     el.getAnimations().forEach(anim => anim.playbackRate = 1.0); // Resume 100%
                 });
+            });
+        });
+
+        // 3D Text Roll Feature (GSAP SplitText Alternative)
+        document.querySelectorAll('.nav a').forEach(link => {
+            const text = link.textContent.trim();
+            link.textContent = ''; // clear original
+            link.classList.add('roll-link');
+            
+            text.split('').forEach((char, i) => {
+                const wrap = document.createElement('span');
+                wrap.className = 'char-wrap';
+                wrap.dataset.char = char === ' ' ? '\u00A0' : char; // Preserve spaces
+                wrap.style.transitionDelay = `${i * 0.04}s`; // Stagger duration
+                link.appendChild(wrap);
             });
         });
     </script>
