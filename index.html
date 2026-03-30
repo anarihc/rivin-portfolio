@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rivin Weeraka Portfolio</title>
+    <link rel="stylesheet" href="styles/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/7.3.2/pixi.min.js"></script>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">®</div>
+        <nav class="nav">
+            <a href="#">ABOUT</a>
+            <a href="#">PORTFOLIO</a>
+            <a href="#">CONTACT</a>
+        </nav>
+    </header>
+
+    <main class="hero">
+        <div class="marquee-wrapper">
+            <div class="marquee line1">
+                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
+                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
+            </div>
+            <div class="marquee line2">
+                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
+                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
+            </div>
+        </div>
+        
+        <div class="hero-image-container">
+            <canvas id="hero-canvas" class="hero-image"></canvas>
+        </div>
+    </main>
+    <script>
+        const app = new PIXI.Application({
+            view: document.getElementById('hero-canvas'),
+            backgroundAlpha: 0,
+            width: 800,
+            height: 800
+        });
+
+        PIXI.Assets.load([
+            'assets/masked-photo.webp',
+            'assets/depth-map.webp'
+        ]).then((assets) => {
+            const imageTex = assets['assets/masked-photo.webp'];
+            const depthTex = assets['assets/depth-map.webp'];
+            
+            app.renderer.resize(imageTex.width, imageTex.height);
+
+            const image = new PIXI.Sprite(imageTex);
+            const depthMap = new PIXI.Sprite(depthTex);
+
+            image.width = app.screen.width;
+            image.height = app.screen.height;
+            depthMap.width = app.screen.width;
+            depthMap.height = app.screen.height;
+
+            const displacementFilter = new PIXI.DisplacementFilter(depthMap);
+            displacementFilter.scale.set(0); 
+            image.filters = [displacementFilter];
+
+            app.stage.addChild(image);
+            app.stage.addChild(depthMap);
+
+            let targetX = 0;
+            let currentX = 0;
+
+            window.addEventListener('mousemove', (e) => {
+                const centerX = window.innerWidth / 2;
+                
+                // Reverse direction (negative multiplier) so it looks towards the mouse.
+                // Lowered intensity to 12 to reduce the "liquid/warping" look.
+                targetX = -((e.clientX - centerX) / centerX) * 12; 
+            });
+
+            app.ticker.add(() => {
+                currentX += (targetX - currentX) * 0.05;
+                
+                // Apply displacement only on X axis (left/right)
+                displacementFilter.scale.x = currentX;
+                displacementFilter.scale.y = 0;
+                
+                // Subtle global shift of the entire image alongside the displacement 
+                // to make the whole "statue" follow the turn rather than just warping pixels
+                app.stage.x = currentX * 1.5;
+            });
+            
+            // Seamlessly slow down marquee lines on hover without altering appearance or completely stopping
+            document.querySelectorAll('.marquee').forEach(el => {
+                el.addEventListener('pointerenter', () => {
+                    el.getAnimations().forEach(anim => anim.playbackRate = 0.30); // Drop to 30% speed
+                });
+                
+                el.addEventListener('pointerleave', () => {
+                    el.getAnimations().forEach(anim => anim.playbackRate = 1.0); // Resume 100%
+                });
+            });
+        });
+    </script>
+</body>
+</html>
