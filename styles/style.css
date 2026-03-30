@@ -6,7 +6,7 @@
 
 @font-face {
     font-family: 'Humane';
-    src: local('Humane Regular'), local('Humane-Regular'), local('Humane');
+    src: url('../assets/Humane-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -88,6 +88,7 @@ body {
 
 .line1 .marquee-text,
 .line2 .marquee-text {
+    font-family: 'Humane', sans-serif;
     font-size: 28vw; 
     line-height: 0.76; /* Tighter baseline to match physical caps-height exactly */
     letter-spacing: 0.07em; 
