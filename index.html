@@ -72,12 +72,12 @@
                 const centerX = window.innerWidth / 2;
                 
                 // Reverse direction (negative multiplier) so it looks towards the mouse.
-                // Lowered intensity to 12 to reduce the "liquid/warping" look.
-                targetX = -((e.clientX - centerX) / centerX) * 12; 
+                // Lowered intensity to 8 to reduce the "liquid/warping" look.
+                targetX = -((e.clientX - centerX) / centerX) * 8; 
             });
 
             app.ticker.add(() => {
-                currentX += (targetX - currentX) * 0.05;
+                currentX += (targetX - currentX) * 0.025;
                 
                 // Apply displacement only on X axis (left/right)
                 displacementFilter.scale.x = currentX;
@@ -85,7 +85,7 @@
                 
                 // Subtle global shift of the entire image alongside the displacement 
                 // to make the whole "statue" follow the turn rather than just warping pixels
-                app.stage.x = currentX * 1.5;
+                app.stage.x = currentX * 0.5;
             });
             
             // Seamlessly slow down marquee lines on hover without altering appearance or completely stopping
