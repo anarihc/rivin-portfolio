@@ -194,9 +194,9 @@
                             ctx.beginPath();
                             ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
                             // Glow: brighter dots get a subtle shadow
-                            ctx.shadowColor = `rgba(0, 255, 65, ${alpha * 0.8})`;
+                            ctx.shadowColor = `rgba(255, 255, 255, ${alpha * 0.8})`;
                             ctx.shadowBlur = alpha * 8;
-                            ctx.fillStyle = `rgba(0, 255, 65, ${alpha})`;
+                            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
                             ctx.fill();
                             ctx.shadowBlur = 0;
 

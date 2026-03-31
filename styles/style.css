@@ -177,7 +177,7 @@ body {
     padding-right: 0.07em;
     cursor: default; /* Keep standard arrow instead of text I-beam */
     opacity: 0.8;
-    color: rgb(20, 125, 70);
+    color: rgb(255, 255, 255);
 }
 
 .line1 {
