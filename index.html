@@ -28,14 +28,8 @@
     <main class="hero">
         <canvas class="dot-grid" id="dot-grid"></canvas>
         <div class="marquee-wrapper">
-            <div class="marquee line1">
-                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
-                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
-            </div>
-            <div class="marquee line2">
-                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
-                <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
-            </div>
+            <div class="marquee line1"><span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA </span><span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA </span></div>
+            <div class="marquee line2"><span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA </span><span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA </span></div>
         </div>
         
         <div class="hero-image-container">
@@ -52,70 +46,96 @@
 
         const minLoadTime = new Promise(resolve => setTimeout(resolve, 1500));
 
-        Promise.all([
-            PIXI.Assets.load(['assets/masked-photo.webp', 'assets/depth-map.webp']),
-            minLoadTime
-        ]).then(([assets]) => {
-            // Hide loading screen once main assets are loaded and min time has passed
-            const loader = document.getElementById('loading-screen');
-            if (loader) {
-                loader.classList.add('hidden');
+            // Ensure marquee is shown and stable after font is ready (independent of photo loading)
+            const revealMarquee = () => {
+                const wrapper = document.querySelector('.marquee-wrapper');
+                if (wrapper) {
+                    wrapper.style.opacity = '1';
+                    
+                    // Force Layout Calculation
+                    void wrapper.offsetWidth;
+                    wrapper.classList.add('loaded');
+                    
+                    // Start animations only after fonts/layout are stable
+                    document.querySelectorAll('.marquee').forEach(el => {
+                        el.classList.add('running');
+                    });
+
+                    // Heartbeat Repaint sequence to force Safari to wake up the layer
+                    let count = 0;
+                    const heartbeat = setInterval(() => {
+                        wrapper.style.perspective = (count % 2 === 0) ? '1000.1px' : '1000px';
+                        count++;
+                        if (count > 20) clearInterval(heartbeat);
+                    }, 50);
+                }
+            };
+
+            if (document.fonts) {
+                document.fonts.ready.then(revealMarquee);
+                // Failsafe: reveal anyway after 3 seconds if font ready doesn't fire
+                setTimeout(revealMarquee, 3000);
+            } else {
+                revealMarquee();
             }
 
-            const imageTex = assets['assets/masked-photo.webp'];
-            const depthTex = assets['assets/depth-map.webp'];
-            
-            app.renderer.resize(imageTex.width, imageTex.height);
+            // PIXI Asset Loading
+            Promise.all([
+                PIXI.Assets.load(['assets/masked-photo.webp', 'assets/depth-map.webp']),
+                minLoadTime
+            ]).then(([assets]) => {
+                // Hide loading screen once main assets are loaded and min time has passed
+                const loader = document.getElementById('loading-screen');
+                if (loader) {
+                    loader.classList.add('hidden');
+                }
 
-            const image = new PIXI.Sprite(imageTex);
-            const depthMap = new PIXI.Sprite(depthTex);
-
-            image.width = app.screen.width;
-            image.height = app.screen.height;
-            depthMap.width = app.screen.width;
-            depthMap.height = app.screen.height;
-
-            const displacementFilter = new PIXI.DisplacementFilter(depthMap);
-            displacementFilter.scale.set(0); 
-            image.filters = [displacementFilter];
-
-            app.stage.addChild(image);
-            app.stage.addChild(depthMap);
-
-            let targetX = 0;
-            let currentX = 0;
-
-            window.addEventListener('mousemove', (e) => {
-                const centerX = window.innerWidth / 2;
+                const imageTex = assets['assets/masked-photo.webp'];
+                const depthTex = assets['assets/depth-map.webp'];
                 
-                // Reverse direction (negative multiplier) so it looks towards the mouse.
-                // Lowered intensity to 8 to reduce the "liquid/warping" look.
-                targetX = -((e.clientX - centerX) / centerX) * 8; 
-            });
+                app.renderer.resize(imageTex.width, imageTex.height);
 
-            app.ticker.add(() => {
-                currentX += (targetX - currentX) * 0.025;
-                
-                // Apply displacement only on X axis (left/right)
-                displacementFilter.scale.x = currentX;
-                displacementFilter.scale.y = 0;
-                
-                // Subtle global shift of the entire image alongside the displacement 
-                // to make the whole "statue" follow the turn rather than just warping pixels
-                app.stage.x = currentX * 0.5;
-            });
-            
-            // Seamlessly slow down marquee lines on hover without altering appearance or completely stopping
-            document.querySelectorAll('.marquee').forEach(el => {
-                el.addEventListener('pointerenter', () => {
-                    el.getAnimations().forEach(anim => anim.playbackRate = 0.30); // Drop to 30% speed
+                const image = new PIXI.Sprite(imageTex);
+                const depthMap = new PIXI.Sprite(depthTex);
+
+                image.width = app.screen.width;
+                image.height = app.screen.height;
+                depthMap.width = app.screen.width;
+                depthMap.height = app.screen.height;
+
+                const displacementFilter = new PIXI.DisplacementFilter(depthMap);
+                displacementFilter.scale.set(0); 
+                image.filters = [displacementFilter];
+
+                app.stage.addChild(image);
+                app.stage.addChild(depthMap);
+
+                let targetX = 0;
+                let currentX = 0;
+
+                window.addEventListener('mousemove', (e) => {
+                    const centerX = window.innerWidth / 2;
+                    targetX = -((e.clientX - centerX) / centerX) * 8; 
+                });
+
+                app.ticker.add(() => {
+                    currentX += (targetX - currentX) * 0.025;
+                    displacementFilter.scale.x = currentX;
+                    displacementFilter.scale.y = 0;
+                    app.stage.x = currentX * 0.5;
                 });
                 
-                el.addEventListener('pointerleave', () => {
-                    el.getAnimations().forEach(anim => anim.playbackRate = 1.0); // Resume 100%
+                // Marquee Hover Interaction
+                document.querySelectorAll('.marquee').forEach(el => {
+                    el.addEventListener('pointerenter', () => {
+                        el.getAnimations().forEach(anim => anim.playbackRate = 0.30);
+                    });
+                    
+                    el.addEventListener('pointerleave', () => {
+                        el.getAnimations().forEach(anim => anim.playbackRate = 1.0);
+                    });
                 });
             });
-        });
 
         // 3D Text Roll Feature (GSAP SplitText Alternative)
         document.querySelectorAll('.nav a').forEach(link => {

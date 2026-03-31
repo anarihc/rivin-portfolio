@@ -9,6 +9,7 @@
     src: url('../assets/Humane-Regular.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
+    font-display: swap;
 }
 
 body {
@@ -62,7 +63,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 40px 60px;
-    z-index: 10;
+    z-index: 20; 
 }
 
 .logo {
@@ -148,7 +149,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    z-index: 5; /* Above marquee but behind photo/header */
+    z-index: 2; 
     pointer-events: none;
 }
 
@@ -162,39 +163,60 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    z-index: 2; 
+    z-index: 5; 
+    transform: translateZ(0); 
+    transition: opacity 0.8s ease-out;
 }
 
 
 
 .line1 .marquee-text,
 .line2 .marquee-text {
+    display: inline-block;
     font-family: 'Humane', sans-serif;
     font-size: 26vw; 
-    line-height: 0.76; /* Tighter baseline to match physical caps-height exactly */
+    line-height: 0.76; 
     letter-spacing: 0.07em; 
     text-transform: uppercase;
     padding-right: 0.07em;
-    cursor: default; /* Keep standard arrow instead of text I-beam */
+    cursor: default; 
     opacity: 0.8;
     color: rgb(255, 255, 255);
+    will-change: transform;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
 }
 
 .line1 {
-    animation: marquee-left 25s linear infinite;
+    animation: marquee-left 60s linear infinite;
+    animation-play-state: paused;
 }
 
 .line2 {
-    animation: marquee-left 25s linear infinite;
-    animation-delay: -9s;
+    animation: marquee-right 60s linear infinite;
+    animation-play-state: paused;
+}
+
+.line1.running,
+.line2.running {
+    animation-play-state: running;
 }
 
 @keyframes marquee-left {
     0% {
-        transform: translateX(0);
+        transform: translate3d(0, 0, 0);
     }
     100% {
-        transform: translateX(-50%);
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+@keyframes marquee-right {
+    0% {
+        transform: translate3d(-50%, 0, 0);
+    }
+    100% {
+        transform: translate3d(0, 0, 0);
     }
 }
 
@@ -204,7 +226,7 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    z-index: 5;
+    z-index: 12; 
     height: 100vh;
     display: flex;
     align-items: flex-end;
@@ -231,7 +253,7 @@ body {
 @media (max-width: 768px) {
     .line1 .marquee-text,
     .line2 .marquee-text {
-        font-size: 48vw; /* Boost size on narrow screens */
+        font-size: 38vw; /* Reduced from 48vw to avoid screen crowding on small devices */
     }
 
     .header {
