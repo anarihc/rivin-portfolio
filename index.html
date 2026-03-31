@@ -26,6 +26,7 @@
     </header>
 
     <main class="hero">
+        <canvas class="dot-grid" id="dot-grid"></canvas>
         <div class="marquee-wrapper">
             <div class="marquee line1">
                 <span class="marquee-text">RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA RIVIN WEERAKA</span>
@@ -125,11 +126,89 @@
             text.split('').forEach((char, i) => {
                 const wrap = document.createElement('span');
                 wrap.className = 'char-wrap';
-                wrap.dataset.char = char === ' ' ? '\u00A0' : char; // Preserve spaces
                 wrap.style.transitionDelay = `${i * 0.04}s`; // Stagger duration
+
+                const front = document.createElement('span');
+                front.className = 'char-front';
+                front.textContent = char === ' ' ? '\u00A0' : char;
+
+                const back = document.createElement('span');
+                back.className = 'char-back';
+                back.textContent = char === ' ' ? '\u00A0' : char;
+
+                wrap.appendChild(front);
+                wrap.appendChild(back);
                 link.appendChild(wrap);
             });
         });
+
+        // === Matrix Dot Grid with Glowing Trail ===
+        (function() {
+            const canvas = document.getElementById('dot-grid');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const spacing = 12; // closer dots
+            const dotRadius = 1.2;
+            const revealRadius = 440; // how close mouse must be to light a dot
+            const decayRate = 0.015; // how fast dots fade (lower = longer trail)
+            let mouseX = -9999, mouseY = -9999;
+            let cols, rows, brightness; // brightness array stores each dot's current glow (0-1)
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                cols = Math.ceil(canvas.width / spacing) + 1;
+                rows = Math.ceil(canvas.height / spacing) + 1;
+                brightness = new Float32Array(cols * rows); // all start at 0 (invisible)
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            window.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                mouseX = e.clientX - rect.left;
+                mouseY = e.clientY - rect.top;
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const idx = r * cols + c;
+                        const x = c * spacing;
+                        const y = r * spacing;
+                        const dx = x - mouseX;
+                        const dy = y - mouseY;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        // Boost brightness if near mouse
+                        if (dist < revealRadius) {
+                            const intensity = 1 - (dist / revealRadius);
+                            brightness[idx] = Math.max(brightness[idx], intensity);
+                        }
+
+                        // Draw dot if it has any brightness
+                        if (brightness[idx] > 0.01) {
+                            const alpha = brightness[idx];
+                            ctx.beginPath();
+                            ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                            // Glow: brighter dots get a subtle shadow
+                            ctx.shadowColor = `rgba(0, 255, 65, ${alpha * 0.8})`;
+                            ctx.shadowBlur = alpha * 8;
+                            ctx.fillStyle = `rgba(0, 255, 65, ${alpha})`;
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+
+                            // Decay brightness for trail fade
+                            brightness[idx] -= decayRate;
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
     </script>
 </body>
 </html>
