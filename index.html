@@ -19,9 +19,9 @@
             <img src="assets/rivin-logo.webp" alt="Rivin Logo" class="site-logo">
         </a>
         <nav class="nav">
-            <a href="#">ABOUT</a>
-            <a href="#">PORTFOLIO</a>
-            <a href="#">CONTACT</a>
+            <a href="about.html">ABOUT</a>
+            <a href="portfolio.html">PORTFOLIO</a>
+            <a href="contact.html">CONTACT</a>
         </nav>
     </header>
 
@@ -125,16 +125,7 @@
                     app.stage.x = currentX * 0.5;
                 });
                 
-                // Marquee Hover Interaction
-                document.querySelectorAll('.marquee').forEach(el => {
-                    el.addEventListener('pointerenter', () => {
-                        el.getAnimations().forEach(anim => anim.playbackRate = 0.30);
-                    });
-                    
-                    el.addEventListener('pointerleave', () => {
-                        el.getAnimations().forEach(anim => anim.playbackRate = 1.0);
-                    });
-                });
+
             });
 
         // 3D Text Roll Feature (GSAP SplitText Alternative)

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio | Rivin Weeraka</title>
+    <link rel="icon" type="image/webp" href="assets/rivin-logo.webp">
+    <link href="https://fonts.googleapis.com/css2?family=Abel&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/style.css">
+</head>
+<body class="subpage">
+    <canvas class="dot-grid" id="dot-grid"></canvas>
+
+    <header class="header">
+        <a href="index.html" class="logo">
+            <img src="assets/rivin-logo.webp" alt="Rivin Logo" class="site-logo">
+        </a>
+        <nav class="nav">
+            <a href="about.html">ABOUT</a>
+            <a href="portfolio.html">PORTFOLIO</a>
+            <a href="contact.html">CONTACT</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-header">SELECTED WORKS</h1>
+        
+        <div class="portfolio-grid">
+            <!-- Project 1 -->
+            <div class="project-card">
+                <h2 class="project-title">SITHSEAVANA</h2>
+                <p class="text-body" style="font-size:16px;">Sri Lanka's first bilingual online counseling platform. Architected the entire solution from UI/UX to Firebase backend and deployment, focusing on secure user data and localization.</p>
+                <div class="project-tech">
+                    <span class="tech-chip">React</span>
+                    <span class="tech-chip">Node.js</span>
+                    <span class="tech-chip">Firebase</span>
+                </div>
+            </div>
+
+            <!-- Project 2 -->
+            <div class="project-card">
+                <h2 class="project-title">DATA MAPPER</h2>
+                <p class="text-body" style="font-size:16px;">Dynamic PDF-to-Excel parsing tool developed for IIT. Intelligent table recognition and dynamic header mapping to automate structured data extraction from unstructured PDFs.</p>
+                <div class="project-tech">
+                    <span class="tech-chip">Angular</span>
+                    <span class="tech-chip">TypeScript</span>
+                    <span class="tech-chip">PDF Parsing</span>
+                </div>
+            </div>
+
+            <!-- Project 3 -->
+            <div class="project-card">
+                <h2 class="project-title">SECURE PORTAL</h2>
+                <p class="text-body" style="font-size:16px;">Zero-cost internal student inquiry system using custom Google Apps Script middleware, OAuth 2.0, and a PIN-based session bridge. Saved significant long-term organizational budget.</p>
+                <div class="project-tech">
+                    <span class="tech-chip">Google Apps Script</span>
+                    <span class="tech-chip">OAuth 2.0</span>
+                    <span class="tech-chip">Security</span>
+                </div>
+            </div>
+
+            <!-- Project 4 -->
+            <div class="project-card">
+                <h2 class="project-title">LEAD ENGINE</h2>
+                <p class="text-body" style="font-size:16px;">Automated Python web-scraping ecosystem built to extract targeted profiles from Facebook, generating high-quality leads for the RC Rentals vehicle service.</p>
+                <div class="project-tech">
+                    <span class="tech-chip">Python</span>
+                    <span class="tech-chip">Selenium</span>
+                    <span class="tech-chip">Data Automation</span>
+                </div>
+            </div>
+
+            <!-- Project 5 -->
+            <div class="project-card">
+                <h2 class="project-title">MEDICONNECT</h2>
+                <p class="text-body" style="font-size:16px;">Healthcare software solution emphasizing high-performance forms. Developed the comprehensive Feedback & Inquiry module utilizing server-side rendering logic.</p>
+                <div class="project-tech">
+                    <span class="tech-chip">Next.js</span>
+                    <span class="tech-chip">React</span>
+                    <span class="tech-chip">Web</span>
+                </div>
+            </div>
+
+            <!-- Project 6 -->
+            <div class="project-card">
+                <h2 class="project-title">STUDENT CMS</h2>
+                <p class="text-body" style="font-size:16px;">Enterprise-level full-stack REST API application handling complex CRUD operations for complex student metrics, demonstrating mastery over modern MVC architectures.</p>
+                <div class="project-tech">
+                    <span class="tech-chip">Spring Boot</span>
+                    <span class="tech-chip">Angular</span>
+                    <span class="tech-chip">MySQL</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        document.querySelectorAll('.nav a').forEach(link => {
+            const text = link.textContent.trim();
+            link.textContent = ''; 
+            link.classList.add('roll-link');
+            
+            text.split('').forEach((char, i) => {
+                const wrap = document.createElement('span');
+                wrap.className = 'char-wrap';
+                wrap.style.transitionDelay = `${i * 0.04}s`; 
+                const front = document.createElement('span');
+                front.className = 'char-front';
+                front.textContent = char === ' ' ? '\u00A0' : char;
+
+                const back = document.createElement('span');
+                back.className = 'char-back';
+                back.textContent = char === ' ' ? '\u00A0' : char;
+
+                wrap.appendChild(front);
+                wrap.appendChild(back);
+                link.appendChild(wrap);
+            });
+        });
+
+        // Matrix Dot Grid
+        (function() {
+            const canvas = document.getElementById('dot-grid');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const spacing = 12; 
+            const dotRadius = 1.2;
+            const revealRadius = 440; 
+            const decayRate = 0.015; 
+            let mouseX = -9999, mouseY = -9999;
+            let cols, rows, brightness; 
+
+            function resize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                cols = Math.ceil(canvas.width / spacing) + 1;
+                rows = Math.ceil(canvas.height / spacing) + 1;
+                brightness = new Float32Array(cols * rows); 
+            }
+            resize();
+            window.addEventListener('resize', resize);
+            window.addEventListener('mousemove', (e) => {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let r = 0; r < rows; r++) {
+                    for (let c = 0; c < cols; c++) {
+                        const idx = r * cols + c;
+                        const x = c * spacing;
+                        const y = r * spacing;
+                        const dx = x - mouseX;
+                        const dy = y - mouseY;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < revealRadius) {
+                            const intensity = 1 - (dist / revealRadius);
+                            brightness[idx] = Math.max(brightness[idx], intensity);
+                        }
+
+                        if (brightness[idx] > 0.01) {
+                            const alpha = brightness[idx];
+                            ctx.beginPath();
+                            ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+                            ctx.shadowColor = `rgba(255, 255, 255, ${alpha * 0.8})`;
+                            ctx.shadowBlur = alpha * 8;
+                            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+                            brightness[idx] -= decayRate;
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+    </script>
+</body>
+</html>

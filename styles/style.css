@@ -274,4 +274,219 @@ body {
     }
 }
 
-/*is this on git */
+/* Subpage Framework */
+body.subpage {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: auto;
+    min-height: 100vh;
+    display: block; 
+}
+
+.subpage .header {
+    position: relative; /* Scrolls naturally relative to content, prevents 100vh locking */
+}
+
+.subpage .dot-grid {
+    position: fixed; /* Keep matrix grid alive everywhere during scroll */
+    z-index: 1; 
+}
+
+.main-content {
+    padding: 0 60px 100px 60px;
+    max-width: 1600px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 10;
+}
+
+/* Typography Extensions */
+.page-header {
+    font-family: 'Humane', sans-serif;
+    font-size: 14vw;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 20px;
+    margin-top: 40px;
+    color: #fff;
+    line-height: 0.8;
+}
+
+.text-body {
+    font-family: 'Abel', sans-serif;
+    font-size: 20px;
+    line-height: 1.6;
+    color: #dfdfdf;
+    margin-bottom: 24px;
+    max-width: 800px;
+}
+
+.text-meta {
+    font-family: 'Abel', sans-serif;
+    font-size: 16px;
+    color: #aaaaaa;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+/* About Section */
+.about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+}
+.about-image {
+    width: 100%;
+    aspect-ratio: 4/5;
+    background-color: #111;
+    border: 1px solid #333;
+    object-fit: cover;
+    filter: grayscale(100%);
+    transition: filter 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+.about-image:hover {
+    filter: grayscale(0%);
+}
+.skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 40px;
+}
+.skill-category {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+}
+
+/* Portfolio Section */
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 40px;
+}
+.project-card {
+    background: rgba(20, 20, 20, 0.4);
+    border: 1px solid #222;
+    padding: 40px;
+    transition: transform 0.4s cubic-bezier(0.5, 0, 0, 1), border-color 0.4s ease;
+    cursor: pointer;
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+}
+.project-card:hover {
+    transform: translateY(-10px);
+    border-color: #555;
+    background: rgba(40, 40, 40, 0.6);
+}
+.project-title {
+    font-family: 'Humane', sans-serif;
+    font-size: 80px;
+    line-height: 0.8;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+}
+.project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 30px;
+}
+.tech-chip {
+    border: 1px solid #555;
+    padding: 5px 12px;
+    font-family: 'Abel', sans-serif;
+    font-size: 14px;
+    border-radius: 20px;
+    color: #aaa;
+}
+
+/* Contact Section */
+.contact-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.form-group {
+    width: 100%;
+    margin-bottom: 30px;
+    position: relative;
+}
+.form-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid #555;
+    padding: 15px 0;
+    color: #fff;
+    font-family: 'Abel', sans-serif;
+    font-size: 20px;
+    transition: border-color 0.3s ease;
+}
+.form-input:focus {
+    outline: none;
+    border-bottom-color: #fff;
+}
+.form-input::placeholder {
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+textarea.form-input {
+    resize: none;
+    height: 80px;
+}
+.submit-btn {
+    background: transparent;
+    color: #fff;
+    border: 1px solid #fff;
+    padding: 15px 40px;
+    font-family: 'Abel', sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+}
+.submit-btn:hover {
+    background: #fff;
+    color: #000;
+}
+.contact-details {
+    margin-top: 60px;
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+    border-top: 1px solid #222;
+    padding-top: 40px;
+    width: 100%;
+}
+
+/* Responsive updates for subpages */
+@media (max-width: 768px) {
+    .main-content {
+        padding: 0 25px 60px 25px;
+    }
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
+    .page-header {
+        font-size: 20vw;
+    }
+    .portfolio-grid {
+        grid-template-columns: 1fr;
+    }
+    .project-title {
+        font-size: 60px;
+    }
+    .contact-details {
+        flex-direction: column;
+        gap: 20px;
+    }
+}
